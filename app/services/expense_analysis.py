@@ -24,7 +24,9 @@ class ExpenseAnalysisService:
 
     def __init__(self, data_path: Optional[Path] = None):
         if data_path is None:
-            data_path = Path(__file__).parent.parent.parent / "data" / "transactions.csv"
+            data_path = (
+                Path(__file__).parent.parent.parent / "data" / "transactions.csv"
+            )
         self.data_path = data_path
         self._df: Optional[pd.DataFrame] = None
 
@@ -56,14 +58,11 @@ class ExpenseAnalysisService:
         if df.empty:
             return []
 
-        monthly = (
-            df.groupby("year_month")["amount"]
-            .sum()
-            .abs()
-            .reset_index()
-        )
+        monthly = df.groupby("year_month")["amount"].sum().abs().reset_index()
         monthly["year_month"] = monthly["year_month"].astype(str)
-        return monthly.rename(columns={"year_month": "month", "amount": "total"}).to_dict("records")
+        return monthly.rename(
+            columns={"year_month": "month", "amount": "total"}
+        ).to_dict("records")
 
     def get_category_breakdown(self, year_month: Optional[str] = None) -> list[dict]:
         """Get expense breakdown by category."""
@@ -130,11 +129,13 @@ class ExpenseAnalysisService:
 
         # Calculate monthly average per category
         avg_by_category = (
-            reducible.groupby("category")["amount"]
-            .sum()
-            .abs()
-            / reducible["year_month"].nunique()
-        ).round(0).reset_index()
+            (
+                reducible.groupby("category")["amount"].sum().abs()
+                / reducible["year_month"].nunique()
+            )
+            .round(0)
+            .reset_index()
+        )
         avg_by_category.columns = ["category", "monthly_avg"]
 
         return avg_by_category.to_dict("records")
@@ -182,7 +183,14 @@ class ExpenseAnalysisService:
             current = last_m.get(cat, 0)
             previous = prev_m.get(cat, 0)
             change = ((current - previous) / previous * 100) if previous > 0 else 0
-            mom.append({"category": cat, "current": current, "previous": previous, "change": round(change, 1)})
+            mom.append(
+                {
+                    "category": cat,
+                    "current": current,
+                    "previous": previous,
+                    "change": round(change, 1),
+                }
+            )
 
         # YoY comparison
         yoy = []
@@ -190,7 +198,14 @@ class ExpenseAnalysisService:
             current = last_m.get(cat, 0)
             previous = last_y.get(cat, 0)
             change = ((current - previous) / previous * 100) if previous > 0 else 0
-            yoy.append({"category": cat, "current": current, "previous": previous, "change": round(change, 1)})
+            yoy.append(
+                {
+                    "category": cat,
+                    "current": current,
+                    "previous": previous,
+                    "change": round(change, 1),
+                }
+            )
 
         return {"mom": mom, "yoy": yoy}
 
@@ -200,20 +215,17 @@ class ExpenseAnalysisService:
         if df.empty:
             return []
 
-        monthly = (
-            df.groupby("year_month")["amount"]
-            .sum()
-            .abs()
-            .sort_index()
-        )
+        monthly = df.groupby("year_month")["amount"].sum().abs().sort_index()
 
         ma12 = monthly.rolling(window=12, min_periods=1).mean()
 
-        result = pd.DataFrame({
-            "month": monthly.index.astype(str),
-            "actual": monthly.values,
-            "ma12": ma12.values.round(0),
-        })
+        result = pd.DataFrame(
+            {
+                "month": monthly.index.astype(str),
+                "actual": monthly.values,
+                "ma12": ma12.values.round(0),
+            }
+        )
         return result.to_dict("records")
 
     def get_annual_forecast(self) -> dict:
@@ -230,7 +242,9 @@ class ExpenseAnalysisService:
         months_elapsed = today.month
 
         # Get last 12 months average
-        last_12m = abs(df[df["date"] >= (today - pd.DateOffset(months=12))]["amount"].sum())
+        last_12m = abs(
+            df[df["date"] >= (today - pd.DateOffset(months=12))]["amount"].sum()
+        )
         monthly_avg = last_12m / 12
 
         # Forecast methods
@@ -241,7 +255,7 @@ class ExpenseAnalysisService:
         ma_projection = monthly_avg * 12
 
         # Use weighted average (more weight to recent trend)
-        forecast = (ytd_projection * 0.6 + ma_projection * 0.4)
+        forecast = ytd_projection * 0.6 + ma_projection * 0.4
 
         return {
             "ytd": round(ytd, 0),

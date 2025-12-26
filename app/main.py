@@ -30,20 +30,20 @@ analysis_service = ExpenseAnalysisService()
 
 def load_transactions(exclude_transfer_and_income: bool = True):
     """Load transactions from CSV file.
-    
+
     Args:
         exclude_transfer_and_income: If True, filter out transfer (振替) and income records.
     """
     csv_path = data_dir / "transactions.csv"
     if not csv_path.exists():
         return []
-    
+
     df = pd.read_csv(csv_path)
-    
+
     # Filter out transfer and income records if requested
     if exclude_transfer_and_income:
         df = df[~((df["category"] == "振替") | (df["type"] == "income"))]
-    
+
     df = df.sort_values("date", ascending=False)
     df = df.fillna("")  # Replace NaN with empty string
     return df.to_dict("records")

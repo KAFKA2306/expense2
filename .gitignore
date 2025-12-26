@@ -1,21 +1,11 @@
-__pycache__/
-*.py[cod]
-*$py.class
+*cache*
 
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-*lock
+*env*
+*lock*
 
+data/*
 *.db
 *.sqlite3
-
-# Data directory
-data/*
 *.log
 *.tsv
 *.csv
@@ -24,9 +14,3 @@ data/*
 .DS_Store
 Thumbs.db
 scripts/*
-
-.idea/
-.vscode/
-
-mf_auth.json
-manual_data.tsv
