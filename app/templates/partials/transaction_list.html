@@ -1,0 +1,21 @@
+{% for transaction in transactions %}
+<tr class="hover:bg-gray-50/50 transition-colors">
+    <td class="px-6 py-4 text-gray-500 whitespace-nowrap">{{ transaction.date.strftime('%Y-%m-%d') }}</td>
+    <td class="px-6 py-4 font-medium text-gray-900">{{ transaction.description }}</td>
+    <td class="px-6 py-4 text-gray-500">
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+            {{ transaction.category or 'Uncategorized' }}
+        </span>
+    </td>
+    <td class="px-6 py-4 text-gray-500">{{ transaction.source }}</td>
+    <td class="px-6 py-4 text-right font-medium {{ 'text-red-600' if transaction.amount < 0 else 'text-green-600' }}">
+        ¥{{ "{:,}".format(transaction.amount) }}
+    </td>
+</tr>
+{% else %}
+<tr>
+    <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+        No transactions found. Sync data to get started.
+    </td>
+</tr>
+{% endfor %}

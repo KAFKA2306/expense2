@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <!-- Asset Summary Card -->
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <h2 class="text-gray-500 text-sm font-medium mb-2">Total Assets</h2>
+        <p class="text-3xl font-bold text-gray-900">¥0</p>
+        <span class="text-xs text-green-600 flex items-center mt-2">
+            +0% from last month
+        </span>
+    </div>
+
+    <!-- Expense Summary Card -->
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <h2 class="text-gray-500 text-sm font-medium mb-2">Monthly Expenses</h2>
+        <p class="text-3xl font-bold text-gray-900">¥0</p>
+        <span class="text-xs text-black flex items-center mt-2">
+            No data available
+        </span>
+    </div>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+        <h3 class="font-semibold text-gray-800">Recent Transactions</h3>
+        <button hx-get="/transactions" hx-target="#transaction-body"
+            class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+            View All
+        </button>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+            <thead class="text-xs text-gray-500 uppercase bg-gray-50/50">
+                <tr>
+                    <th class="px-6 py-3 font-medium">Date</th>
+                    <th class="px-6 py-3 font-medium">Description</th>
+                    <th class="px-6 py-3 font-medium">Category</th>
+                    <th class="px-6 py-3 font-medium">Source</th>
+                    <th class="px-6 py-3 font-medium text-right">Amount</th>
+                </tr>
+            </thead>
+            <tbody id="transaction-body" class="divide-y divide-gray-100">
+                {% include 'partials/transaction_list.html' %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
