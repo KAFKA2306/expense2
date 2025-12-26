@@ -23,6 +23,7 @@ data/*
 *.txt
 .DS_Store
 Thumbs.db
+scripts/*
 
 .idea/
 .vscode/
