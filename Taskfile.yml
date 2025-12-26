@@ -7,6 +7,6 @@ tasks:
   auth:
     cmd: uv run python -m scripts.auth_mf
 
-  check:
+  lint:
     cmd: uv run ruff check . --fix
     cmd: uv run ruff format .
