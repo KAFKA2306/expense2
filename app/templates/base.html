@@ -7,13 +7,37 @@
     <title>Expense Tracker</title>
     <!-- Tailwind CSS (CDN for minimal setup) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- HTMX -->
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <!-- HTMX v2.0 (optimized) -->
+    <script src="https://unpkg.com/htmx.org@2.0.4"
+        integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"
+        crossorigin="anonymous"></script>
     <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
+        }
+
+        /* HTMX loading indicator */
+        .htmx-request .htmx-indicator {
+            display: inline-block;
+        }
+
+        .htmx-indicator {
+            display: none;
+        }
+
+        /* Smooth fade transition */
+        .htmx-swapping {
+            opacity: 0;
+            transition: opacity 0.15s ease-out;
+        }
+
+        .htmx-settling {
+            opacity: 1;
+            transition: opacity 0.15s ease-in;
         }
     </style>
 </head>
@@ -21,12 +45,29 @@
 <body class="bg-gray-50 text-gray-900 min-h-screen">
     <nav class="bg-white border-b border-gray-200 px-6 py-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold text-indigo-600">Expense Tracker</h1>
+            <div class="flex items-center gap-6">
+                <h1 class="text-xl font-bold text-indigo-600">Expense Tracker</h1>
+                <div class="flex gap-4 text-sm">
+                    <a href="/" class="text-gray-600 hover:text-indigo-600 transition-colors">Dashboard</a>
+                    <a href="/analysis" class="text-gray-600 hover:text-indigo-600 transition-colors">Analysis</a>
+                </div>
+            </div>
             <div>
-                <button hx-post="/sync" hx-target="#notifications" hx-swap="innerHTML"
+
+                <button hx-post="/sync" hx-target="#notifications" hx-swap="innerHTML settle:0.2s"
+                    hx-indicator="#sync-spinner"
                     class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg id="sync-spinner" class="htmx-indicator animate-spin" xmlns="http://www.w3.org/2000/svg"
+                        width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                        <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+                        <path d="M16 21h5v-5"></path>
+                    </svg>
+                    <svg class="htmx-request-hide" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
                         <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
                         <path d="M3 3v5h5"></path>
                         <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>

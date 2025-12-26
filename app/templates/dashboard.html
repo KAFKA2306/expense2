@@ -24,8 +24,14 @@
 <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
         <h3 class="font-semibold text-gray-800">Recent Transactions</h3>
-        <button hx-get="/transactions" hx-target="#transaction-body"
-            class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+        <button hx-get="/transactions" hx-target="#transaction-body" hx-swap="innerHTML settle:0.2s"
+            hx-indicator="#load-spinner"
+            class="text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
+            <svg id="load-spinner" class="htmx-indicator animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg"
+                fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
             View All
         </button>
     </div>
@@ -34,9 +40,11 @@
             <thead class="text-xs text-gray-500 uppercase bg-gray-50/50">
                 <tr>
                     <th class="px-6 py-3 font-medium">Date</th>
+                    <th class="px-6 py-3 font-medium">Day</th>
                     <th class="px-6 py-3 font-medium">Description</th>
                     <th class="px-6 py-3 font-medium">Category</th>
                     <th class="px-6 py-3 font-medium">Source</th>
+                    <th class="px-6 py-3 font-medium">Tags</th>
                     <th class="px-6 py-3 font-medium text-right">Amount</th>
                 </tr>
             </thead>

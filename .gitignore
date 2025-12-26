@@ -13,11 +13,14 @@ venv.bak/
 
 *.db
 *.sqlite3
+
+# Data directory
+data/*
 *.log
 *.tsv
 *.csv
 *.json
-
+*.txt
 .DS_Store
 Thumbs.db
 

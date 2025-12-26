@@ -2,11 +2,12 @@ version: '3'
 
 tasks:
   dev:
-    cmd: uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    cmd: . .venv/bin/activate && python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   auth:
-    cmd: uv run python -m scripts.auth_mf
+    cmd: python -m scripts.auth_mf
 
   lint:
-    cmd: uv run ruff check . --fix
-    cmd: uv run ruff format .
+    cmds:
+      - ruff check . --fix
+      - ruff format .

@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="text-gray-500 text-xs font-medium mb-1">Monthly Avg</h3>
+            <p class="text-2xl font-bold text-gray-900">¥{{ "{:,.0f}".format(analysis.annual_forecast.monthly_avg) }}
+            </p>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="text-gray-500 text-xs font-medium mb-1">YTD Spend</h3>
+            <p class="text-2xl font-bold text-gray-900">¥{{ "{:,.0f}".format(analysis.annual_forecast.ytd) }}</p>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="text-gray-500 text-xs font-medium mb-1">Annual Forecast</h3>
+            <p class="text-2xl font-bold text-indigo-600">¥{{ "{:,.0f}".format(analysis.annual_forecast.forecast) }}</p>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="text-gray-500 text-xs font-medium mb-1">Fixed / Variable</h3>
+            <p class="text-lg font-bold text-gray-900">
+                ¥{{ "{:,.0f}".format(analysis.fixed_vs_variable.fixed) }} / ¥{{
+                "{:,.0f}".format(analysis.fixed_vs_variable.variable) }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Monthly Trend Chart -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="font-semibold text-gray-800 mb-4">Monthly Expense Trend (12MA)</h3>
+            <canvas id="trendChart" height="200"></canvas>
+        </div>
+
+        <!-- Category Breakdown Chart -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="font-semibold text-gray-800 mb-4">Category Breakdown</h3>
+            <canvas id="categoryChart" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- Tables Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Merchant Ranking -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+                <h3 class="font-semibold text-gray-800">Top Merchants</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="text-xs text-gray-500 uppercase bg-gray-50/50">
+                        <tr>
+                            <th class="px-4 py-2 text-left">#</th>
+                            <th class="px-4 py-2 text-left">Merchant</th>
+                            <th class="px-4 py-2 text-right">Count</th>
+                            <th class="px-4 py-2 text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        {% for m in analysis.merchant_ranking %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-500">{{ loop.index }}</td>
+                            <td class="px-4 py-2 font-medium truncate max-w-[200px]" title="{{ m.merchant }}">{{
+                                m.merchant[:30] }}{% if m.merchant|length > 30 %}...{% endif %}</td>
+                            <td class="px-4 py-2 text-right text-gray-600">{{ m.count }}</td>
+                            <td class="px-4 py-2 text-right font-medium">¥{{ "{:,.0f}".format(m.total) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Reducible Expenses -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+                <h3 class="font-semibold text-gray-800">Reducible Expenses (Monthly Avg)</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="text-xs text-gray-500 uppercase bg-gray-50/50">
+                        <tr>
+                            <th class="px-4 py-2 text-left">Category</th>
+                            <th class="px-4 py-2 text-right">Monthly Avg</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        {% for r in analysis.reducible_expenses %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-2 font-medium">{{ r.category }}</td>
+                            <td class="px-4 py-2 text-right font-medium text-amber-600">¥{{
+                                "{:,.0f}".format(r.monthly_avg) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MoM / YoY Comparison -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+            <h3 class="font-semibold text-gray-800">Month-over-Month Comparison</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="text-xs text-gray-500 uppercase bg-gray-50/50">
+                    <tr>
+                        <th class="px-4 py-2 text-left">Category</th>
+                        <th class="px-4 py-2 text-right">Current</th>
+                        <th class="px-4 py-2 text-right">Previous</th>
+                        <th class="px-4 py-2 text-right">Change</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for item in analysis.comparison.mom %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-2 font-medium">{{ item.category }}</td>
+                        <td class="px-4 py-2 text-right">¥{{ "{:,.0f}".format(item.current) }}</td>
+                        <td class="px-4 py-2 text-right text-gray-500">¥{{ "{:,.0f}".format(item.previous) }}</td>
+                        <td
+                            class="px-4 py-2 text-right font-medium {% if item.change > 0 %}text-red-500{% elif item.change < 0 %}text-green-500{% endif %}">
+                            {% if item.change > 0 %}+{% endif %}{{ item.change }}%
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Monthly Trend with 12MA
+    const trendData = {{ analysis.moving_average | tojson }};
+    new Chart(document.getElementById('trendChart'), {
+        type: 'bar',
+        data: {
+            labels: trendData.map(d => d.month),
+            datasets: [{
+                label: 'Actual',
+                data: trendData.map(d => d.actual),
+                backgroundColor: 'rgba(99, 102, 241, 0.6)',
+                borderColor: '#6366f1',
+                borderWidth: 1,
+            }, {
+                label: '12MA',
+                type: 'line',
+                data: trendData.map(d => d.ma12),
+                borderColor: '#f59e0b',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                tension: 0.3,
+                pointRadius: 0,
+                fill: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    // Category Breakdown
+    const categoryData = {{ analysis.category_breakdown | tojson }};
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'doughnut',
+        data: {
+            labels: categoryData.map(d => d.category),
+            datasets: [{
+                data: categoryData.map(d => d.amount),
+                backgroundColor: [
+                    '#6366f1', '#8b5cf6', '#d946ef', '#ec4899', '#f43f5e',
+                    '#f97316', '#eab308', '#84cc16', '#22c55e', '#14b8a6'
+                ],
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'right' } }
+        }
+    });
+</script>
+{% endblock %}
